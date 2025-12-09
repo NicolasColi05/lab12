@@ -8,7 +8,7 @@ import java.util.List;
  */
 public class LogicsImpl implements Logics {
 
-    private final List<Button> listOfButton = new ArrayList<>();
+    private final List<Integer> listOfButton = new ArrayList<>();
 
     /**
      * Constructor.
@@ -17,7 +17,7 @@ public class LogicsImpl implements Logics {
      */
     public LogicsImpl(final int size) {
         for (int i = 0; i < size; i++) {
-            listOfButton.add(new Button(0, size - 1));
+            listOfButton.add(0);
         }
     }
 
@@ -35,8 +35,8 @@ public class LogicsImpl implements Logics {
     @Override
     public List<Integer> values() {
         final List<Integer> values = new ArrayList<>();
-        for (final Button button : listOfButton) {
-            values.add(button.getValue());
+        for (final Integer i : listOfButton) {
+            values.add(i);
         }
         return values;
     }
@@ -50,7 +50,12 @@ public class LogicsImpl implements Logics {
         // for (final Button button : listOfButton) {
         //     states.add(button.isEnebled());
         // }
-        return listOfButton.stream().map(Button::isEnebled).toList();
+        // return listOfButton.stream().map(Button::isEnebled).toList();
+        return listOfButton.stream()
+            .map(v -> { 
+                return v < listOfButton.size() - 1; 
+            })
+            .toList();
     }
 
     /**
@@ -58,8 +63,13 @@ public class LogicsImpl implements Logics {
      */
     @Override
     public int hit(final int elem) {
-        this.listOfButton.get(elem).buttonHit();
-        return listOfButton.get(elem).getValue();
+        final int temp = listOfButton.get(elem);
+        if (temp < listOfButton.size() - 1) {
+            listOfButton.remove(elem);
+            listOfButton.add(elem, temp + 1);
+        }
+
+        return listOfButton.get(elem);
     }
 
     /**
@@ -68,8 +78,8 @@ public class LogicsImpl implements Logics {
     @Override
     public String result() {
        final StringBuilder result = new StringBuilder("<<");
-       for (final Button button : listOfButton) {
-            result.append('|').append(button.getValue());
+       for (final Integer i : listOfButton) {
+            result.append('|').append(i);
        }
        return result.append(">>").toString();
     }
@@ -79,38 +89,6 @@ public class LogicsImpl implements Logics {
      */
     @Override
     public boolean toQuit() {
-        return listOfButton.stream().map(Button:: getValue).distinct().count() == 1L;
-    }
-
-    private final class Button {
-        private int value;
-        private boolean enabled;
-        private final int max;
-
-        Button(final int value, final int max) {
-            this.value = value;
-            this.enabled = true;
-            this.max = max;
-        }
-
-        public int getValue() {
-            return value;
-        }
-
-        public boolean isEnebled() {
-            return enabled;
-        }
-
-        public void setDisabledStates() {
-            this.enabled = false;
-        }
-
-        public void buttonHit() {
-            if (value < max) {
-                this.value = this.value + 1;
-            } else {
-                setDisabledStates();
-            }
-        }
+        return listOfButton.stream().distinct().count() == 1L;
     }
 }
