@@ -1,5 +1,6 @@
 package it.unibo.es1;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -7,7 +8,7 @@ import java.util.List;
  */
 public class LogicsImpl implements Logics {
 
-    private static final String ERROR_MESSAGE = "Unimplemented method";
+    private final List<Button> listOfButton = new ArrayList<>();
 
     /**
      * Constructor.
@@ -15,7 +16,9 @@ public class LogicsImpl implements Logics {
      * @param size the size of the logics
      */
     public LogicsImpl(final int size) {
-        throw new UnsupportedOperationException(ERROR_MESSAGE);
+        for (int i = 0; i < size; i++) {
+            listOfButton.add(new Button(0, size - 1));
+        }
     }
 
     /**
@@ -23,7 +26,7 @@ public class LogicsImpl implements Logics {
      */
     @Override
     public int size() {
-        throw new UnsupportedOperationException(ERROR_MESSAGE);
+        return this.listOfButton.size();
     }
 
     /**
@@ -31,7 +34,11 @@ public class LogicsImpl implements Logics {
      */
     @Override
     public List<Integer> values() {
-        throw new UnsupportedOperationException(ERROR_MESSAGE);
+        final List<Integer> values = new ArrayList<>();
+        for (final Button button : listOfButton) {
+            values.add(button.getValue());
+        }
+        return values;
     }
 
     /**
@@ -39,7 +46,11 @@ public class LogicsImpl implements Logics {
      */
     @Override
     public List<Boolean> enabledStates() {
-        throw new UnsupportedOperationException(ERROR_MESSAGE);
+        // final List<Boolean> states = new ArrayList<>();
+        // for (final Button button : listOfButton) {
+        //     states.add(button.isEnebled());
+        // }
+        return listOfButton.stream().map(Button::isEnebled).toList();
     }
 
     /**
@@ -47,7 +58,8 @@ public class LogicsImpl implements Logics {
      */
     @Override
     public int hit(final int elem) {
-        throw new UnsupportedOperationException(ERROR_MESSAGE);
+        this.listOfButton.get(elem).buttonHit();
+        return listOfButton.get(elem).getValue();
     }
 
     /**
@@ -55,7 +67,11 @@ public class LogicsImpl implements Logics {
      */
     @Override
     public String result() {
-        throw new UnsupportedOperationException(ERROR_MESSAGE);
+       final StringBuilder result = new StringBuilder("<<");
+       for (final Button button : listOfButton) {
+            result.append('|').append(button.getValue());
+       }
+       return result.append(">>").toString();
     }
 
     /**
@@ -63,6 +79,38 @@ public class LogicsImpl implements Logics {
      */
     @Override
     public boolean toQuit() {
-        throw new UnsupportedOperationException(ERROR_MESSAGE);
+        return listOfButton.stream().map(Button:: getValue).distinct().count() == 1L;
+    }
+
+    private final class Button {
+        private int value;
+        private boolean enabled;
+        private final int max;
+
+        Button(final int value, final int max) {
+            this.value = value;
+            this.enabled = true;
+            this.max = max;
+        }
+
+        public int getValue() {
+            return value;
+        }
+
+        public boolean isEnebled() {
+            return enabled;
+        }
+
+        public void setDisabledStates() {
+            this.enabled = false;
+        }
+
+        public void buttonHit() {
+            if (value < max) {
+                this.value = this.value + 1;
+            } else {
+                setDisabledStates();
+            }
+        }
     }
 }
