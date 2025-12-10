@@ -14,3 +14,4 @@ import java.io.Serializable;
  * @param y second element
  */
 public record Pair<X, Y>(X x, Y y) implements Serializable { }
+
